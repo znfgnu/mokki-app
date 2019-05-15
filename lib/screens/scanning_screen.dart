@@ -45,10 +45,7 @@ class ScanningScreenState extends State<ScanningScreen> {
         child: Text("Scanning for nearby devices..."),
       );
     } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: _buildScanResultTiles(),
-      );
+      return _buildScanResultTiles();
     }
   }
 
@@ -98,15 +95,22 @@ class ScanningScreenState extends State<ScanningScreen> {
   }
 
   _buildScanResultTiles() {
-    return scanResults.values
-        .map((r) =>
-        ScanResultTile(
-            result: r,
-            onTap: () => _openAddDeviceScreen(r),
-    )).
-    toList
-    (
-    );
+    if (scanResults.isNotEmpty) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: scanResults.values
+            .map((r) =>
+            ScanResultTile(
+              result: r,
+              onTap: () => _openAddDeviceScreen(r),
+            )).toList(),
+      );
+    } else {
+      return Container(
+        alignment: Alignment.center,
+        child: Text("Can't find any devices. Try scanning again."),
+      );
+    }
   }
 
   _buildScanningButton() {
