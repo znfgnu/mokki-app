@@ -35,8 +35,8 @@ class DeviceDashboardScreenState extends State<DeviceDashboardScreen> {
   _buildInfo() {
     return Center(
       child: MaterialButton(
-        child: Text("Info"),
-        onPressed: _bleTest,
+        child: Text("Blink upload"),
+        onPressed: _blinkUpload,
       ),
     );
   }
@@ -44,8 +44,10 @@ class DeviceDashboardScreenState extends State<DeviceDashboardScreen> {
   _buildCommands() {
     return Center(
       child: MaterialButton(
-        child: Text("Commands"),
-        onPressed: _bleTest,
+        child: Text("Run program"),
+        onPressed: () {
+          _runCmd(1, true);
+        },
       ),
     );
   }
@@ -53,8 +55,10 @@ class DeviceDashboardScreenState extends State<DeviceDashboardScreen> {
   _buildRoms() {
     return Center(
       child: MaterialButton(
-        child: Text("ROMS"),
-        onPressed: _bleTest,
+        child: Text("Reset device"),
+        onPressed: () {
+          _runCmd(0, false);
+        },
       ),
     );
   }
@@ -149,7 +153,7 @@ class DeviceDashboardScreenState extends State<DeviceDashboardScreen> {
 //    _connect();
   }
 
-  _bleTest() async {
+  _blinkUpload() async {
     var queue = StreamQueue<List<int>>(characteristicChangeStream);
     ByteData program = await rootBundle.load("images/blink.bin");
     List<int> response;
@@ -168,15 +172,24 @@ class DeviceDashboardScreenState extends State<DeviceDashboardScreen> {
       response = await queue.next;
       print(response);
     }
+  }
 
-//    // Send programming request
-//    _writeCharacteristic([0x01, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
-//    response = await queue.next;
+  _runCmd(int cmdNo, bool waitForResponse) async {
+    var queue = StreamQueue<List<int>>(characteristicChangeStream);
+    List<int> response;
 
+    var packet = Uint8List(3).buffer;
+    var bdata = new ByteData.view(packet);
+    bdata.setUint8(0, 0x05);
+    bdata.setUint16(1, cmdNo, Endian.little);
 
-    _writeCharacteristic([0x01, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
-    response = await queue.next;
-    print('test $response');
+    _writeCharacteristic(packet.asUint8List());
+
+    if (waitForResponse) {
+      response = await queue.next;
+      print(response);
+    }
+
   }
 
   _setNotification() async {
