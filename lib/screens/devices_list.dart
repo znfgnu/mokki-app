@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mokki_app/app_drawer.dart';
 import 'package:mokki_app/device.dart';
+import 'package:mokki_app/screens/device_dashboard_screen.dart';
 import 'package:mokki_app/screens/scanning_screen.dart';
 import 'package:mokki_app/state_container.dart';
 import 'package:mokki_app/widgets/device_list_entry.dart';
@@ -14,7 +15,7 @@ class DevicesListScreenState extends State<DevicesListScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Device> devicesList;
 
-  openScanningScreen(BuildContext context) async {
+  _openScanningScreen(BuildContext context) async {
     final Device result = await Navigator.of(context).push(MaterialPageRoute(
         fullscreenDialog: true, builder: (context) => new ScanningScreen()));
 
@@ -25,6 +26,13 @@ class DevicesListScreenState extends State<DevicesListScreen> {
             ? "Successfully added ${result.name}."
             : "Device not added"),
       ));
+  }
+
+  _openDeviceDashboard(Device device) {
+    Navigator.of(context).push(new MaterialPageRoute(
+        builder: (ctx) => DeviceDashboardScreen(
+              device: device,
+            )));
   }
 
   Widget buildDevicesList() {
@@ -38,6 +46,10 @@ class DevicesListScreenState extends State<DevicesListScreen> {
         itemCount: devicesList.length,
         itemBuilder: (ctx, idx) => DeviceListEntry(
               device: devicesList[idx],
+              onTap: () {
+                final Device device = devicesList[idx];
+                _openDeviceDashboard(device);
+              },
             ),
       );
     }
@@ -57,7 +69,7 @@ class DevicesListScreenState extends State<DevicesListScreen> {
       drawer: AppDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          openScanningScreen(context);
+          _openScanningScreen(context);
         },
         child: Icon(Icons.add),
       ),

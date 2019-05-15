@@ -3,8 +3,9 @@ import 'package:mokki_app/device.dart';
 
 class DeviceListEntry extends StatelessWidget {
   final Device device;
+  final VoidCallback onTap;
 
-  DeviceListEntry({this.device});
+  DeviceListEntry({this.device, this.onTap});
 
   Widget build(BuildContext context) {
     return ListTile(
@@ -17,7 +18,7 @@ class DeviceListEntry extends StatelessWidget {
           Text(device.name),
         ],
       ),
-      onTap: () {}, // TODO: enter Device screen on tap
+      onTap: onTap, // TODO: enter Device screen on tap
     );
   }
 
